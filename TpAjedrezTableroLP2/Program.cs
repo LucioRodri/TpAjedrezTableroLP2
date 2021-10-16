@@ -250,8 +250,8 @@ namespace TpAjedrezLP2
             {
                 tablero[posicionTorre1[0] + i, posicionTorre1[1]] = 1; //pinto como atacada toda la primer columna
                 tablero[posicionTorre1[0], posicionTorre1[1] + i] = 1; //pinto como atacada toda la primer fila
-                tablero[posicionTorre2[0] - i, posicionTorre1[1]] = 1; //pinto como atacada toda la ultima columna
-                tablero[posicionTorre1[0], posicionTorre1[1] - i] = 1; //pinto como atacada toda la ultima fila
+                tablero[posicionTorre2[0] - i, posicionTorre2[1]] = 1; //pinto como atacada toda la ultima columna
+                tablero[posicionTorre2[0], posicionTorre2[1] - i] = 1; //pinto como atacada toda la ultima fila
             }
             return 28;
         }
@@ -320,7 +320,7 @@ namespace TpAjedrezLP2
         }
         public static void CopiarTablero(int[,] tableroFuente, int[,] tableroDestino)
         {
-            tableroFuente.CopyTo(tableroDestino, 0);
+            //tableroFuente.CopyTo(tableroDestino, 0); //tirar error, hay que revisarla
         }
 
     }
