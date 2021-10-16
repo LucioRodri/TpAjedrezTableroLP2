@@ -29,7 +29,7 @@ namespace TpAjedrezLP2
             int CasillasMaxAux = 0;
             int casillasAtacadas = 0;
             int[] PosPiezaParcial = new int[2]; 
-            int[,] PosPiezas = new int[5, 2];
+            int[,] PosPiezas = new int[5,2];
 
             //TORRES
             int[] PosTorre1 = new int[2];
@@ -71,17 +71,18 @@ namespace TpAjedrezLP2
                         }
                         for (int k = auxK; k < N; k = +aux)
                         {
+                            //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
                             PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
                             CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
                             if (CasillasMaxAux > CasillasMax)
                             {
                                 CasillasMax = CasillasMaxAux;
                                 PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
-
                             }
                         }
                     }
-
+                    PosPiezas[i,0] = PosPiezaParcial[0];
+                    PosPiezas[i, 1] = PosPiezaParcial[1];
                     SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux);
                     casillasAtacadas += atacarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
                     pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
@@ -99,7 +100,129 @@ namespace TpAjedrezLP2
 
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
+            int contadorCasillas = 0;
+            if (tablero[fila, columna] == 0)
+                contadorCasillas = 1; //si pongo la pieza en una posicion vacia
+            switch (pieza)
+            {
+                case Piezas.Rey:
+                    if(fila != 0 && fila != 7 && columna != 0 && columna != 7)
+                    {
+                        if (tablero[fila + 1, columna - 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna + 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila + 1, columna + 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna - 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila, columna - 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila, columna + 1] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila + 1, columna] == 0)
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna] == 0)
+                            contadorCasillas++;
+                    }
+                    else //caso en los bordes 
+                    {
+                        if (tablero[fila + 1, columna - 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna + 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila + 1, columna + 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna - 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila, columna - 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila, columna + 1] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila + 1, columna] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                        if (tablero[fila - 1, columna] == 0 && DentroTablero(fila, columna))
+                            contadorCasillas++;
+                    }
+                    break;
+                case Piezas.AB:
+                case Piezas.AN:
+                    int i = 1;
+                    int direcciones = 0;
+                    while (direcciones != 4)
+                    {
+                        if (direcciones == 0)
+                        {
+                            if (!DentroTablero(fila - i, columna - i))//arriba a la izquierda
+                                direcciones++;
+                            else if (tablero[fila - i, columna - i] == 0)
+                            {
+                                contadorCasillas++;
+                                i++;
+                            }
+                        }
+                        if (direcciones == 1)
+                        {
+                            i = 1;
+                            if (!DentroTablero(fila - i, columna + i)) //arriba a la derecha
+                                direcciones++;
+                            else if (tablero[fila - i, columna + i] == 0)
+                            {
+                                contadorCasillas++;
+                                i++;
+                            }
+                        }
+                        if (direcciones == 2)
+                        {
+                            i = 1;
+                            if (!DentroTablero(fila + i, columna + i)) //abajo a la derecha
+                                direcciones++;
+                            else if (tablero[fila + i, columna + i] == 0)
+                            {
+                                contadorCasillas++;
+                                i++;
+                            }
+                                
+                        }
+                        if (direcciones == 3) 
+                        {
+                            i = 1;
+                            if (!DentroTablero(fila + i, columna - i)) //arriba a la derecha
+                                direcciones++;
+                            else if (tablero[fila + i, columna - i] == 0)
+                            {
+                                contadorCasillas++;
+                                i++;
+                            }
+                        }
+                    }
+                    break;
 
+                case Piezas.C1:
+                case Piezas.C2:
+                    if (DentroTablero(fila - 2, columna - 1) && tablero[fila - 2,columna - 1] == 0)
+                        contadorCasillas++;
+                    if (tablero[fila - 2,columna + 1] == 0 && DentroTablero(fila - 2, columna + 1))
+                        contadorCasillas++;
+                    if (tablero[fila + 2,columna - 1] == 0 && DentroTablero(fila + 2, columna - 1))
+                        contadorCasillas++;
+                    if (tablero[fila + 2,columna + 1] == 0 && DentroTablero(fila + 2, columna + 1))
+                        contadorCasillas++;
+                    if (tablero[fila - 1,columna - 2] == 0 && DentroTablero(fila - 1, columna - 2))
+                        contadorCasillas++;
+                    if (tablero[fila + 1,columna - 2] == 0 && DentroTablero(fila + 1, columna - 2))
+                        contadorCasillas++;
+                    if (tablero[fila - 1, columna + 2] == 0 && DentroTablero(fila - 1, columna + 2))
+                        contadorCasillas++;
+                    if (tablero[fila + 1,  columna + 2] == 0 && DentroTablero(fila + 1, columna + 2))
+                        contadorCasillas++;                   
+                    break;   
+                    
+                case Piezas.Reina:
+
+                    break;
+            }
+            return contadorCasillas;
         }
 
         public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
