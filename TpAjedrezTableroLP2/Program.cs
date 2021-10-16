@@ -26,11 +26,10 @@ namespace TpAjedrezLP2
 
             int ContTableros = 0;
             int CasillasMax = 0;
+            int CasillasMaxAux = 0;
             int casillasAtacadas = 0;
-            int[] PosPiezaParcial = new int[2]; // [fila, columna], va a ser la posición donde se ponga el alfil blanco
+            int[] PosPiezaParcial = new int[2]; 
             int[,] PosPiezas = new int[5, 2];
-            int[,] OrdenesUsados = new int[124, 8];
-            int contOrdenes = 0;
 
             //TORRES
             int[] PosTorre1 = new int[2];
@@ -40,22 +39,70 @@ namespace TpAjedrezLP2
             casillasAtacadas += colocarTorres(PosTorre1, PosTorre2, TableroOriginal);
 
             int[] PosReina = new int[2];
+             
+            int auxK = 0; //para el segundo for interior
 
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
-                //TODO: aca deberiamos llamar para que se cree un orden de las piezas
-                arrayPiezas = OrdenAleatorio(arrayPiezas);
+                //Determinamos el orden aleatorio que se van a probar las piezas
+                int[] arrayAux = OrdenAleatorio(arrayPiezas); //para no modificar el array original
+                //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
                 int fila = rnd.Next(4, 6);
                 int columna = rnd.Next(4, 6);
                 SetPosicion(Program.Piezas.Reina, fila, columna, TableroOriginal); //cuando implementemos el forms, esto queda determinado por el usuario
+
                 atacarCasillas(fila, columna, Piezas.Reina, TableroOriginal);
+                CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
+
+                //Triple for n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
+                for (int i = 0; i < 5; i++)//FOR para cada pieza xq son 5 piezas
+                {
+                    CasillasMax = 0;
+                    int aux = 1;
+                    for (int j = 0; j < N; j++)
+                    {
+                        if (arrayPiezas[i] == (int)Piezas.AB || arrayPiezas[i] == (int)Piezas.AN)//Pregunta si la pieza es un alfil
+                        {
+                            aux = 2; //incrementamos el for de a 2 
+                            if ((arrayPiezas[i] == (int)Piezas.AB && j % 2 != 0) || (arrayPiezas[i] == (int)Piezas.AN && j % 2 == 0))
+                                auxK = 1;
+                        }
+                        for (int k = auxK; k < N; k = +aux)
+                        {
+                            PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
+                            CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
+                            if (CasillasMaxAux > CasillasMax)
+                            {
+                                CasillasMax = CasillasMaxAux;
+                                PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
+
+                            }
+                        }
+                    }
+
+                    SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux);
+                    casillasAtacadas += atacarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
+                    pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
+                }
+                casillasAtacadas += CasillasMax;
+                if(casillasAtacadas == 64)
+                {
+                    //llamar funcion atacar casillas fatales
+                    ImprimirTablero(TableroAux);
+                    ContTableros++;
+                }
             } while (ContTableros < Tableros);
 
         }
 
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
+        {
+
+        }
+
+        public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
 
         }
@@ -72,7 +119,6 @@ namespace TpAjedrezLP2
             }
             return Piezas;
         }
-
         public static int colocarTorres(int[] posicionTorre1, int[] posicionTorre2, int[,] tablero)
         {
             tablero[posicionTorre1[0], posicionTorre1[1]] = (int)Piezas.T1;
@@ -137,6 +183,7 @@ namespace TpAjedrezLP2
                 return true;
             return false;
         }
+        //Completar
         public static void ImprimirTablero(int[,] tablero)
         {
             for (int i = 0; i < N; i++)
