@@ -22,7 +22,7 @@ namespace TpAjedrezLP2
             // ----------------------------------------TABLEROS Y VARIABLES -----------------------------------------------
             int[,] TableroOriginal = CrearTablero();
             int[,] TableroAux = CrearTablero();
-            int[] Piezas = CrearPiezas();
+            int[] arrayPiezas = CrearPiezas();
 
             int ContTableros = 0;
             int CasillasMax = 0;
@@ -45,37 +45,33 @@ namespace TpAjedrezLP2
             do
             {
                 //TODO: aca deberiamos llamar para que se cree un orden de las piezas
+                arrayPiezas = OrdenAleatorio(arrayPiezas);
                 Random rnd = new Random();
                 int fila = rnd.Next(4, 6);
                 int columna = rnd.Next(4, 6);
-                SetPosicion(Program.Piezas.Reina, fila, columna, TableroOriginal);
+                SetPosicion(Program.Piezas.Reina, fila, columna, TableroOriginal); //cuando implementemos el forms, esto queda determinado por el usuario
+                atacarCasillas(fila, columna, Piezas.Reina, TableroOriginal);
             } while (ContTableros < Tableros);
 
         }
 
-        /*public static int crearOrdenPiezas(this int[] Piezas, int[,] OrdenesUsados,  int contadorOrdenes)
+        public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
-            while(true)
-            {
-                /*
-                 * codigo de orden random
-                
-                if (verificarOrden(Piezas,  OrdenesUsados, contadorOrdenes) == true)
-                    break;
-            }
-            return contadorOrdenes++;
-        } 
 
-        public static bool verificarOrden(int[,] Piezas, int[,] Ordenes, int cantidad)
+        }
+        public static int[] OrdenAleatorio(int[] Piezas)
         {
-            int i;
-            for(i = 0; i < cantidad; i++)
-            {
+            Random rand = new Random();
 
+            for (int i = 0; i < Piezas.Length - 1; i++)
+            {
+                int j = rand.Next(i, Piezas.Length);
+                int aux = Piezas[i];
+                Piezas[i] = Piezas[j];
+                Piezas[j] = aux;
             }
-            if (i == cantidad)
-                return false;
-        }*/
+            return Piezas;
+        }
 
         public static int colocarTorres(int[] posicionTorre1, int[] posicionTorre2, int[,] tablero)
         {
