@@ -218,8 +218,44 @@ namespace TpAjedrezLP2
                         contadorCasillas++;                   
                     break;   
                     
-                case Piezas.Reina:
+                case Piezas.Reina: 
+                    i = 1;                  
+                    while(contadorCasillas != 29) //ya ataco todas las casillas posibles para la reina
+                    {
+                        if (tablero[fila + i, columna + i] == 0 && DentroTablero(fila + i, columna + i))
+                        contadorCasillas++;
+                        else
+                        contadorCasillas++;
+                        if (tablero[fila + i, columna - i] == 0 && DentroTablero(fila + i, columna - i))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++; ;
+                        if (tablero[fila - i, columna + i] == 0 && DentroTablero(fila - i, columna + i))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
+                        if (tablero[fila - i, columna - i] == 0 && DentroTablero(fila - i, columna - i))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
+                        if (tablero[fila, columna + i] == 0 && DentroTablero(fila, columna + i))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
+                        if (tablero[fila, columna - i] == 0 && DentroTablero(fila, columna - i))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
+                        if (tablero[fila + i, columna] == 0 && DentroTablero(fila + i, columna))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
+                        if (tablero[fila - i, columna ] == 0 && DentroTablero(fila - i, columna))
+                            contadorCasillas++;
+                        else
+                            contadorCasillas++;
 
+                    }
                     break;
             }
             return contadorCasillas;
@@ -320,6 +356,7 @@ namespace TpAjedrezLP2
         }
         public static void CopiarTablero(int[,] tableroFuente, int[,] tableroDestino)
         {
+            
             //tableroFuente.CopyTo(tableroDestino, 0); //tirar error, hay que revisarla
         }
 
