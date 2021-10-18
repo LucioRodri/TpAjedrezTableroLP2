@@ -129,22 +129,45 @@ namespace TpAjedrezLP2
                     }
                     else //caso en los bordes 
                     {
-                        if (tablero[fila + 1, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila + 1, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila + 1, columna] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
+                        if(DentroTablero(fila + 1, columna - 1))
+                        {if (tablero[fila + 1, columna - 1] == 0) 
+                                contadorCasillas++;
+                        }
+                        if (DentroTablero(fila - 1, columna + 1))
+                        { if (tablero[fila - 1, columna + 1] == 0)
+                                contadorCasillas++;
+                        }
+                        if ( DentroTablero(fila + 1, columna + 1))
+                        {
+                            if(tablero[fila + 1, columna + 1] == 0)
+                                contadorCasillas++;
+                        }
+                        if(DentroTablero(fila - 1, columna - 1))
+                        {
+                            if (tablero[fila - 1, columna - 1] == 0)
+                                contadorCasillas++;
+                        }
+                        if(DentroTablero(fila, columna - 1))
+                        {
+                            if (tablero[fila, columna - 1] == 0)
+                                contadorCasillas++;
+                        }
+                        if(DentroTablero(fila, columna + 1))
+                        {
+                            if (tablero[fila, columna + 1] == 0 )
+                                contadorCasillas++;
+                        }
+                        if(DentroTablero(fila + 1, columna))
+                        {
+                            if (tablero[fila + 1, columna] == 0)
+                                contadorCasillas++;
+                        }
+                       if(DentroTablero(fila - 1, columna))
+                        {
+                            if (tablero[fila - 1, columna] == 0 )
+                                contadorCasillas++;
+                        }
+                     
                     }
                     break;
                 case Piezas.AB:
