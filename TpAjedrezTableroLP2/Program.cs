@@ -41,11 +41,12 @@ namespace TpAjedrezLP2
 
             int[] PosReina = new int[2];
              
-            int auxK = 0; //para el segundo for interior
+            int auxK; //para el segundo for interior
 
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
+                TableroAux = (int[,])TableroOriginal.Clone();
                 casillasAtacadas = 28; //las casillas que atacan las torres
                 //Determinamos el orden aleatorio que se van a probar las piezas
                 int[] arrayAux = OrdenAleatorio(arrayPiezas); //para no modificar el array original
@@ -53,13 +54,13 @@ namespace TpAjedrezLP2
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
                 int columna = rnd.Next(3, 5);
-                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Reina, TableroOriginal);
-                SetPosicion(Program.Piezas.Reina, fila, columna, TableroOriginal); //cuando implementemos el forms, esto queda determinado por el usuario
+                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Reina, TableroAux);
+                SetPosicion(Program.Piezas.Reina, fila, columna, TableroAux); //cuando implementemos el forms, esto queda determinado por el usuario
                 PosReina[0] = fila;
                 PosReina[1] = columna;
 
                 //CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
-                TableroAux = (int[,])TableroOriginal.Clone(); //la funcion de CopiarTablero() no esta funcionando
+                 //la funcion de CopiarTablero() no esta funcionando
                 //Triple for n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
                 for (int i = 0; i < 5; i++)//FOR para cada pieza xq son 5 piezas
                 {
@@ -67,10 +68,11 @@ namespace TpAjedrezLP2
                     int aux = 1;
                     for (int j = 0; j < N; j++)
                     {
+                        auxK = 0;
                         if (arrayPiezas[i] == (int)Piezas.AB || arrayPiezas[i] == (int)Piezas.AN)//Pregunta si la pieza es un alfil
                         {
                             aux = 2; //incrementamos el for de a 2 
-                            if ((arrayPiezas[i] == (int)Piezas.AB && j % 2 != 0) || (arrayPiezas[i] == (int)Piezas.AN && j % 2 == 0))
+                            if ((arrayPiezas[i] == (int)Piezas.AB && j % 2 == 0) || (arrayPiezas[i] == (int)Piezas.AN && j % 2 != 0))
                                 auxK = 1;
                         }
                         for (int k = auxK; k < N; k = k + aux)
@@ -80,16 +82,11 @@ namespace TpAjedrezLP2
                             {
                                 //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
                                 CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
-                                if (CasillasMaxAux > CasillasMax)
+                                if (CasillasMaxAux >= CasillasMax)
                                 {
                                     CasillasMax = CasillasMaxAux;
                                     PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
-                                }
-                                if (CasillasMaxAux == 0)
-                                {                          
-                                    PosPiezaParcial[0] = j;
-                                    PosPiezaParcial[1] = k;
-                                }
+                                }                             
                             }
                         }
                     }
@@ -226,7 +223,7 @@ namespace TpAjedrezLP2
                         }
                         if (direcciones == 3) 
                         {
-                            if (!DentroTablero(fila + d3, columna - d3)) //arriba a la derecha
+                            if (!DentroTablero(fila + d3, columna - d3)) //abajo a la izquierda
                                 direcciones++;
                             else if (tablero[fila + d3, columna - d3] == 0)
                             {
@@ -332,6 +329,7 @@ namespace TpAjedrezLP2
                                     tablero[fila - i, columna] = 1;
                                     contadorCasillas++;
                                 }
+                                break;
                             case 4:
                                 if (DentroTablero(fila + i, columna + i))
                                 {
@@ -397,6 +395,7 @@ namespace TpAjedrezLP2
                                         contadorCasillas++;
                                     }
                                 }
+                                break;
                         } 
                         
                         i++;
