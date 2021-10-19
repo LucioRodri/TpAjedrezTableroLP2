@@ -14,7 +14,7 @@ namespace TpAjedrezLP2
         {
             //El 0: Casilla Vacia
             //   1: Casilla Atacada
-            Rey = 3, Reina, AB, AN, T1, T2, C1, C2
+            Reina = 2, T1, T2, Rey, AN, AB, C1, C2
         }
 
         static void Main()
@@ -28,7 +28,8 @@ namespace TpAjedrezLP2
             int CasillasMax = 0;
             int CasillasMaxAux = 0;
             int casillasAtacadas = 0;
-            int[] PosPiezaParcial = new int[2]; 
+            int[] PosPiezaParcial = new int[2];
+            int[] PosPiezaParcialAux = new int[2];
             int[,] PosPiezas = new int[5,2];
 
             //TORRES
@@ -45,19 +46,20 @@ namespace TpAjedrezLP2
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
+                casillasAtacadas = 28; //las casillas que atacan las torres
                 //Determinamos el orden aleatorio que se van a probar las piezas
                 int[] arrayAux = OrdenAleatorio(arrayPiezas); //para no modificar el array original
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
-                int fila = rnd.Next(4, 6);
-                int columna = rnd.Next(4, 6);
+                int fila = rnd.Next(3, 5);
+                int columna = rnd.Next(3, 5);
                 casillasAtacadas += atacarCasillas(fila, columna, Piezas.Reina, TableroOriginal);
                 SetPosicion(Program.Piezas.Reina, fila, columna, TableroOriginal); //cuando implementemos el forms, esto queda determinado por el usuario
                 PosReina[0] = fila;
                 PosReina[1] = columna;
-                
-                CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
 
+                //CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
+                TableroAux = (int[,])TableroOriginal.Clone(); //la funcion de CopiarTablero() no esta funcionando
                 //Triple for n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
                 for (int i = 0; i < 5; i++)//FOR para cada pieza xq son 5 piezas
                 {
@@ -71,25 +73,33 @@ namespace TpAjedrezLP2
                             if ((arrayPiezas[i] == (int)Piezas.AB && j % 2 != 0) || (arrayPiezas[i] == (int)Piezas.AN && j % 2 == 0))
                                 auxK = 1;
                         }
-                        for (int k = auxK; k < N; k = +aux)
+                        for (int k = auxK; k < N; k = k + aux)
                         {
-                            //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
-                            PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
-                            CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
-                            if (CasillasMaxAux > CasillasMax)
+                        
+                            if (ValidarPosicion(j, k, TableroAux, (Piezas)arrayPiezas[i]))
                             {
-                                CasillasMax = CasillasMaxAux;
-                                PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
+                                //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
+                                CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
+                                if (CasillasMaxAux > CasillasMax)
+                                {
+                                    CasillasMax = CasillasMaxAux;
+                                    PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
+                                }
+                                if (CasillasMaxAux == 0)
+                                {                          
+                                    PosPiezaParcial[0] = j;
+                                    PosPiezaParcial[1] = k;
+                                }
                             }
                         }
                     }
                     PosPiezas[i,0] = PosPiezaParcial[0];
                     PosPiezas[i, 1] = PosPiezaParcial[1];
                     SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux);
-                    casillasAtacadas += atacarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
+                    casillasAtacadas += CasillasMax;
                     pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux);
                 }
-                casillasAtacadas += CasillasMax;
+                //casillasAtacadas += CasillasMax;
                 if(casillasAtacadas == 64)
                 {
                     //llamar funcion atacar casillas fatales
@@ -102,7 +112,7 @@ namespace TpAjedrezLP2
 
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
-            int contadorCasillas = 0;
+            int contadorCasillas = 0, i ;
             if (tablero[fila, columna] == 0)
                 contadorCasillas = 1; //si pongo la pieza en una posicion vacia
             switch (pieza)
@@ -172,75 +182,104 @@ namespace TpAjedrezLP2
                     break;
                 case Piezas.AB:
                 case Piezas.AN:
-                    int i = 1;
+                    int d0 = 1, d1 = 1, d2 = 1, d3 = 1;
                     int direcciones = 0;
                     while (direcciones != 4)
                     {
                         if (direcciones == 0)
                         {
-                            if (!DentroTablero(fila - i, columna - i))//arriba a la izquierda
+                            if (!DentroTablero(fila - d0, columna - d0))//arriba a la izquierda
                                 direcciones++;
-                            else if (tablero[fila - i, columna - i] == 0)
+                            else if (tablero[fila - d0, columna - d0] == 0)
                             {
                                 contadorCasillas++;
-                                i++;
+                                d0++;
                             }
+                            else
+                                d0++;
                         }
                         if (direcciones == 1)
                         {
-                            i = 1;
-                            if (!DentroTablero(fila - i, columna + i)) //arriba a la derecha
+                            if (!DentroTablero(fila - d1, columna + d1)) //arriba a la derecha
                                 direcciones++;
-                            else if (tablero[fila - i, columna + i] == 0)
+                            else if (tablero[fila - d1, columna + d1] == 0)
                             {
                                 contadorCasillas++;
-                                i++;
+                                d1++;
                             }
+                            else
+                                d1++;
                         }
                         if (direcciones == 2)
                         {
-                            i = 1;
-                            if (!DentroTablero(fila + i, columna + i)) //abajo a la derecha
+                            if (!DentroTablero(fila + d2, columna + d2)) //abajo a la derecha
                                 direcciones++;
-                            else if (tablero[fila + i, columna + i] == 0)
+                            else if (tablero[fila + d2, columna + d2] == 0)
                             {
                                 contadorCasillas++;
-                                i++;
+                                d2++;
                             }
+                            else
+                                d2++;
                                 
                         }
                         if (direcciones == 3) 
                         {
-                            i = 1;
-                            if (!DentroTablero(fila + i, columna - i)) //arriba a la derecha
+                            if (!DentroTablero(fila + d3, columna - d3)) //arriba a la derecha
                                 direcciones++;
-                            else if (tablero[fila + i, columna - i] == 0)
+                            else if (tablero[fila + d3, columna - d3] == 0)
                             {
                                 contadorCasillas++;
-                                i++;
+                                d3++;
                             }
+                            else
+                                d3++;
                         }
                     }
                     break;
 
                 case Piezas.C1:
                 case Piezas.C2:
-                    if (DentroTablero(fila - 2, columna - 1) && tablero[fila - 2,columna - 1] == 0)
-                        contadorCasillas++;
-                    if (tablero[fila - 2,columna + 1] == 0 && DentroTablero(fila - 2, columna + 1))
-                        contadorCasillas++;
-                    if (tablero[fila + 2,columna - 1] == 0 && DentroTablero(fila + 2, columna - 1))
-                        contadorCasillas++;
-                    if (tablero[fila + 2,columna + 1] == 0 && DentroTablero(fila + 2, columna + 1))
-                        contadorCasillas++;
-                    if (tablero[fila - 1,columna - 2] == 0 && DentroTablero(fila - 1, columna - 2))
-                        contadorCasillas++;
-                    if (tablero[fila + 1,columna - 2] == 0 && DentroTablero(fila + 1, columna - 2))
-                        contadorCasillas++;
-                    if (tablero[fila - 1, columna + 2] == 0 && DentroTablero(fila - 1, columna + 2))
-                        contadorCasillas++;
-                    if (tablero[fila + 1,  columna + 2] == 0 && DentroTablero(fila + 1, columna + 2))
-                        contadorCasillas++;                   
+                    if (DentroTablero(fila - 2, columna - 1))
+                    {
+                        if (tablero[fila - 2, columna - 1] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila - 2, columna + 1))
+                    {
+                        if (tablero[fila - 2, columna + 1] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila + 2, columna - 1))
+                    {
+                        if (tablero[fila + 2, columna - 1] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila + 2, columna + 1))
+                    {
+                        if (tablero[fila + 2, columna + 1] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila - 1, columna - 2))
+                    {
+                        if (tablero[fila - 1, columna - 2] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila + 1, columna - 2))
+                    {
+                        if (tablero[fila + 1, columna - 2] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila - 1, columna + 2))
+                    {
+                        if (tablero[fila - 1, columna + 2] == 0)
+                            contadorCasillas++;
+                    }
+                    if (DentroTablero(fila + 1, columna + 2))
+                    {
+                        if (tablero[fila + 1, columna + 2] == 0)
+                            contadorCasillas++;
+                    }
                     break;   
                     
                 case Piezas.Reina: 
@@ -248,62 +287,62 @@ namespace TpAjedrezLP2
                     while (contadorCasillas != 20) //ya ataco todas las casillas posibles para la reina,
                                                    //esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
                     {
-                        if (fila + i < 6 && columna + i < 6)
+                        if (DentroTablero(fila + i, columna + i))
                         {
-                            if (tablero[fila + i, columna + i] == 0 && DentroTablero(fila + i, columna + i))
+                            if (tablero[fila + i, columna + i] == 0 )
                             {
                                 tablero[fila + i, columna + i] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if (fila + i < 6 && columna - i > 1)
+                        if (DentroTablero(fila + i, columna - i))
                         {
-                            if (tablero[fila + i, columna - i] == 0 && DentroTablero(fila + i, columna - i))
+                            if (tablero[fila + i, columna - i] == 0)
                                 contadorCasillas++;
                         }
-                        if (fila - i > 1 && columna + i < 6)
+                        if (DentroTablero(fila - i, columna + i))
                         {
-                            if (tablero[fila - i, columna + i] == 0 && DentroTablero(fila - i, columna + i))
+                            if (tablero[fila - i, columna + i] == 0)
                             {
                                 tablero[fila - i, columna + i] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if(fila-i > 1 && columna - i >1)
+                        if(DentroTablero(fila - i, columna - i))
                         {
-                            if (tablero[fila - i, columna - i] == 0 && DentroTablero(fila - i, columna - i))
+                            if (tablero[fila - i, columna - i] == 0)
                             {
                                 tablero[fila - i, columna - i] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if (columna + i < 6)
+                        if (DentroTablero(fila, columna + i))
                         {
-                            if (tablero[fila, columna + i] == 0 && DentroTablero(fila, columna + i))
+                            if (tablero[fila, columna + i] == 0)
                             {
                                 tablero[fila, columna + i] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if (columna - i > 1)
+                        if (DentroTablero(fila, columna - i))
                         {
-                            if (tablero[fila, columna - i] == 0 && DentroTablero(fila, columna - i))
+                            if (tablero[fila, columna - i] == 0)
                             {
                                 tablero[fila, columna - i] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if (fila + i < 6)
+                        if (DentroTablero(fila + i, columna))
                         {
-                            if (tablero[fila + i, columna] == 0 && DentroTablero(fila + i, columna))
+                            if (tablero[fila + i, columna] == 0)
                             {
                                 tablero[fila + i, columna] = 1;
                                 contadorCasillas++;
                             }
                         }
-                        if (fila - i > 1)
+                        if (DentroTablero(fila - i, columna))
                         {
-                            if (tablero[fila - i, columna] == 0 && DentroTablero(fila - i, columna))
+                            if (tablero[fila - i, columna] == 0)
                             {
                                 tablero[fila - i, columna] = 1;
                                 contadorCasillas++;
@@ -317,123 +356,174 @@ namespace TpAjedrezLP2
 
         public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
-            int contadorCasillas = 0;
-            if (tablero[fila, columna] == 0)
-                contadorCasillas = 1; //si pongo la pieza en una posicion vacia
+            int i = 0;
             switch (pieza)
             {
                 case Piezas.Rey:
                     if (fila != 0 && fila != 7 && columna != 0 && columna != 7)
                     {
                         if (tablero[fila + 1, columna - 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila + 1, columna - 1] =1;
                         if (tablero[fila - 1, columna + 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila - 1, columna + 1] =1;
                         if (tablero[fila + 1, columna + 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila + 1, columna + 1] =1;
                         if (tablero[fila - 1, columna - 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila - 1, columna - 1] =1;
                         if (tablero[fila, columna - 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila, columna - 1] =1;
                         if (tablero[fila, columna + 1] == 0)
-                            contadorCasillas++;
+                            tablero[fila, columna + 1] =1;
                         if (tablero[fila + 1, columna] == 0)
-                            contadorCasillas++;
+                            tablero[fila + 1, columna] =1;
                         if (tablero[fila - 1, columna] == 0)
-                            contadorCasillas++;
+                            tablero[fila - 1, columna] =1;
                     }
                     else //caso en los bordes 
                     {
-                        if (tablero[fila + 1, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila + 1, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila, columna - 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila, columna + 1] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila + 1, columna] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
-                        if (tablero[fila - 1, columna] == 0 && DentroTablero(fila, columna))
-                            contadorCasillas++;
+                        if (DentroTablero(fila + 1, columna - 1))
+                        {
+                            if (tablero[fila + 1, columna - 1] == 0)
+                                tablero[fila + 1, columna - 1] =1;
+                        }
+                        if (DentroTablero(fila - 1, columna + 1))
+                        {
+                            if (tablero[fila - 1, columna + 1] == 0)
+                                tablero[fila - 1, columna + 1] =1;
+                        }
+                        if (DentroTablero(fila + 1, columna + 1))
+                        {
+                            if (tablero[fila + 1, columna + 1] == 0)
+                                tablero[fila + 1, columna + 1] =1;
+                        }
+                        if (DentroTablero(fila - 1, columna - 1))
+                        {
+                            if (tablero[fila - 1, columna - 1] == 0)
+                                tablero[fila - 1, columna - 1] =1;
+                        }
+                        if (DentroTablero(fila, columna - 1))
+                        {
+                            if (tablero[fila, columna - 1] == 0)
+                                tablero[fila, columna - 1] =1;
+                        }
+                        if (DentroTablero(fila, columna + 1))
+                        {
+                            if (tablero[fila, columna + 1] == 0)
+                                tablero[fila, columna + 1] =1;
+                        }
+                        if (DentroTablero(fila + 1, columna))
+                        {
+                            if (tablero[fila + 1, columna] == 0)
+                                tablero[fila + 1, columna] =1;
+                        }
+                        if (DentroTablero(fila - 1, columna))
+                        {
+                            if (tablero[fila - 1, columna] == 0)
+                                tablero[fila - 1, columna] =1;
+                        }
+
                     }
                     break;
                 case Piezas.AB:
                 case Piezas.AN:
-                    int i = 1;
+                    int d0 = 1,d1 = 1, d2 = 1, d3=1;
                     int direcciones = 0;
                     while (direcciones != 4)
                     {
                         if (direcciones == 0)
                         {
-                            if (!DentroTablero(fila - i, columna - i))//arriba a la izquierda
+                            if (!DentroTablero(fila - d0, columna - d0))//arriba a la izquierda
                                 direcciones++;
-                            else if (tablero[fila - i, columna - i] == 0)
+                            else if (tablero[fila - d0, columna - d0] == 0)
                             {
-                                contadorCasillas++;
-                                i++;
+                                tablero[fila - d0, columna - d0] = 1;
+                                d0++;
                             }
+                            else
+                                d0++;
                         }
                         if (direcciones == 1)
                         {
-                            i = 1;
-                            if (!DentroTablero(fila - i, columna + i)) //arriba a la derecha
+                            if (!DentroTablero(fila - d1, columna + d1)) //arriba a la derecha
                                 direcciones++;
-                            else if (tablero[fila - i, columna + i] == 0)
+                            else if (tablero[fila - d1, columna + d1] == 0)
                             {
-                                contadorCasillas++;
-                                i++;
+                                tablero[fila - d1, columna + d1] = 1;
+                                d1++;
                             }
+                            else
+                                d1++;
                         }
                         if (direcciones == 2)
                         {
-                            i = 1;
-                            if (!DentroTablero(fila + i, columna + i)) //abajo a la derecha
+                            if (!DentroTablero(fila + d2, columna + d2)) //abajo a la derecha
                                 direcciones++;
-                            else if (tablero[fila + i, columna + i] == 0)
+                            else if (tablero[fila + d2, columna + d2] == 0)
                             {
-                                contadorCasillas++;
-                                i++;
+                                tablero[fila + d2, columna + d2] = 1;
+                                d2++;
                             }
-
+                            else
+                                d2++;
                         }
                         if (direcciones == 3)
                         {
-                            i = 1;
-                            if (!DentroTablero(fila + i, columna - i)) //arriba a la derecha
+                            if (!DentroTablero(fila + d3, columna - d3)) //arriba a la derecha
                                 direcciones++;
-                            else if (tablero[fila + i, columna - i] == 0)
+                            else if (tablero[fila + d3, columna - d3] == 0)
                             {
-                                contadorCasillas++;
-                                i++;
+                                tablero[fila + d3, columna - d3] = 1;
+                                d3++;
                             }
+                            else
+                                d3++;
                         }
                     }
                     break;
 
                 case Piezas.C1:
                 case Piezas.C2:
-                    if (DentroTablero(fila - 2, columna - 1) && tablero[fila - 2, columna - 1] == 0)
-                        contadorCasillas++;
-                    if (tablero[fila - 2, columna + 1] == 0 && DentroTablero(fila - 2, columna + 1))
-                        contadorCasillas++;
-                    if (tablero[fila + 2, columna - 1] == 0 && DentroTablero(fila + 2, columna - 1))
-                        contadorCasillas++;
-                    if (tablero[fila + 2, columna + 1] == 0 && DentroTablero(fila + 2, columna + 1))
-                        contadorCasillas++;
-                    if (tablero[fila - 1, columna - 2] == 0 && DentroTablero(fila - 1, columna - 2))
-                        contadorCasillas++;
-                    if (tablero[fila + 1, columna - 2] == 0 && DentroTablero(fila + 1, columna - 2))
-                        contadorCasillas++;
-                    if (tablero[fila - 1, columna + 2] == 0 && DentroTablero(fila - 1, columna + 2))
-                        contadorCasillas++;
-                    if (tablero[fila + 1, columna + 2] == 0 && DentroTablero(fila + 1, columna + 2))
-                        contadorCasillas++;
-                    break;             
+                    if (DentroTablero(fila - 2, columna - 1))
+                    {
+                        if (tablero[fila - 2, columna - 1] == 0)
+                            tablero[fila - 2, columna - 1] =1;
+                    }
+                    if (DentroTablero(fila - 2, columna + 1))
+                    {
+                        if (tablero[fila - 2, columna + 1] == 0)
+                            tablero[fila - 2, columna + 1] =1;
+                    }
+                    if (DentroTablero(fila + 2, columna - 1))
+                    {
+                        if (tablero[fila + 2, columna - 1] == 0)
+                            tablero[fila + 2, columna - 1] =1;
+                    }
+                    if (DentroTablero(fila + 2, columna + 1))
+                    {
+                        if (tablero[fila + 2, columna + 1] == 0)
+                            tablero[fila + 2, columna + 1] =1;
+                    }
+                    if (DentroTablero(fila - 1, columna - 2))
+                    {
+                        if (tablero[fila - 1, columna - 2] == 0)
+                            tablero[fila - 1, columna - 2] =1;
+                    }
+                    if (DentroTablero(fila + 1, columna - 2))
+                    {
+                        if (tablero[fila + 1, columna - 2] == 0)
+                            tablero[fila + 1, columna - 2] =1;
+                    }
+                    if (DentroTablero(fila - 1, columna + 2))
+                    {
+                        if (tablero[fila - 1, columna + 2] == 0)
+                            tablero[fila - 1, columna + 2] =1;
+                    }
+                    if (DentroTablero(fila + 1, columna + 2))
+                    {
+                        if (tablero[fila + 1, columna + 2] == 0)
+                            tablero[fila + 1, columna + 2] = 1;
+                    }
+                    break;
             }           
         }
         public static int[] OrdenAleatorio(int[] Piezas)
@@ -476,15 +566,12 @@ namespace TpAjedrezLP2
         }
         public static int[] CrearPiezas()
         {//Nos fijamos como podemos hacer para que a la hora de imprimir el tablero coloquemos Sus iniciales en el numero de la pieza
-            int[] aux = new int[8];
+            int[] aux = new int[5];
             aux[0] = (int)Piezas.Rey;
-            aux[1] = (int)Piezas.Reina;
-            aux[2] = (int)Piezas.AB;
-            aux[3] = (int)Piezas.AN;
-            aux[4] = (int)Piezas.T1;
-            aux[5] = (int)Piezas.T2;
-            aux[6] = (int)Piezas.C1;
-            aux[7] = (int)Piezas.C2;
+            aux[1] = (int)Piezas.C1;
+            aux[2] = (int)Piezas.C2;
+            aux[3] = (int)Piezas.AB;
+            aux[4] = (int)Piezas.AN;
             return aux;
 
         }
