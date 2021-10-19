@@ -14,7 +14,7 @@ namespace TpAjedrezLP2
         {
             //El 0: Casilla Vacia
             //   1: Casilla Atacada
-            Reina = 2, T1, T2, Rey, AN, AB, C1, C2
+            Ra = 2, T1, T2, Ry, AN, AB, C1, C2
         }
 
         static void Main()
@@ -54,8 +54,8 @@ namespace TpAjedrezLP2
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
                 int columna = rnd.Next(3, 5);
-                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Reina, TableroAux);
-                SetPosicion(Program.Piezas.Reina, fila, columna, TableroAux); //cuando implementemos el forms, esto queda determinado por el usuario
+                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Ra, TableroAux);
+                SetPosicion(Program.Piezas.Ra, fila, columna, TableroAux); //cuando implementemos el forms, esto queda determinado por el usuario
                 PosReina[0] = fila;
                 PosReina[1] = columna;
 
@@ -115,7 +115,7 @@ namespace TpAjedrezLP2
                 contadorCasillas = 1; //si pongo la pieza en una posicion vacia
             switch (pieza)
             {
-                case Piezas.Rey:
+                case Piezas.Ry:
                     if(fila != 0 && fila != 7 && columna != 0 && columna != 7)
                     {
                         if (tablero[fila + 1, columna - 1] == 0)
@@ -280,7 +280,7 @@ namespace TpAjedrezLP2
                     }
                     break;   
                     
-                case Piezas.Reina:
+                case Piezas.Ra:
                     i = 1;
                     while (i<5) //ya ataco todas las casillas posibles para la reina,//esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
                     {
@@ -408,7 +408,7 @@ namespace TpAjedrezLP2
             int i = 0;
             switch (pieza)
             {
-                case Piezas.Rey:
+                case Piezas.Ry:
                     if (fila != 0 && fila != 7 && columna != 0 && columna != 7)
                     {
                         if (tablero[fila + 1, columna - 1] == 0)
@@ -616,7 +616,7 @@ namespace TpAjedrezLP2
         public static int[] CrearPiezas()
         {//Nos fijamos como podemos hacer para que a la hora de imprimir el tablero coloquemos Sus iniciales en el numero de la pieza
             int[] aux = new int[5];
-            aux[0] = (int)Piezas.Rey;
+            aux[0] = (int)Piezas.Ry;
             aux[1] = (int)Piezas.C1;
             aux[2] = (int)Piezas.C2;
             aux[3] = (int)Piezas.AB;
@@ -640,12 +640,12 @@ namespace TpAjedrezLP2
             if (tablero[fila, columna] == 0 || tablero[fila, columna] == 1)
                 return true;
             //Si hay un rey y quiero poner un caballo
-            if (tablero[fila, columna] == (int)Piezas.Rey && (pieza == Piezas.C1 || pieza == Piezas.C2))
+            if (tablero[fila, columna] == (int)Piezas.Ry && (pieza == Piezas.C1 || pieza == Piezas.C2))
                 return true;
             //Si hay un caballo y quiero poner un rey
-            if (tablero[fila, columna] == (int)Piezas.C1 && pieza == Piezas.Rey)
+            if (tablero[fila, columna] == (int)Piezas.C1 && pieza == Piezas.Ry)
                 return true;
-            if (tablero[fila, columna] == (int)Piezas.C2 && pieza == Piezas.Rey)
+            if (tablero[fila, columna] == (int)Piezas.C2 && pieza == Piezas.Ry)
                 return true;
             return false;
         }
@@ -656,10 +656,15 @@ namespace TpAjedrezLP2
             {
                 for (int j = 0; j < N; j++)
                 {
-                    Console.Write(tablero[i, j] + " ");
+                    if(tablero[i,j] <= 1)
+                        Console.Write(tablero[i, j] + "\t ");
+                    else
+                        Console.Write((Piezas)tablero[i, j] + "\t ");
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
+            Console.WriteLine();
         }
         public static void CopiarTablero(int[,] tableroFuente, int[,] tableroDestino)
         {
