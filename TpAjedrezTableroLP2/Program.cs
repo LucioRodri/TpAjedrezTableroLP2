@@ -283,12 +283,11 @@ namespace TpAjedrezLP2
                     }
                     break;   
                     
-                case Piezas.Reina: 
+                case Piezas.Reina:
                     i = 1;
                     while (i<5) //ya ataco todas las casillas posibles para la reina,//esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
                     {
-                        switch (i)
-                        {
+                        switch (i){
                             case 1:
                             case 2:
                             case 3:
@@ -332,6 +331,7 @@ namespace TpAjedrezLP2
                                     tablero[fila - i, columna] = 1;
                                     contadorCasillas++;
                                 }
+                                break;
                             case 4:
                                 if (DentroTablero(fila + i, columna + i))
                                 {
@@ -397,6 +397,7 @@ namespace TpAjedrezLP2
                                         contadorCasillas++;
                                     }
                                 }
+                                break;
                         } 
                         
                         i++;
