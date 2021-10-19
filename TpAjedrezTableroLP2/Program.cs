@@ -112,7 +112,8 @@ namespace TpAjedrezLP2
 
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
-            int contadorCasillas = 0, i ;
+            int contadorCasillas = 0;
+            int i ;
             if (tablero[fila, columna] == 0)
                 contadorCasillas = 1; //si pongo la pieza en una posicion vacia
             switch (pieza)
@@ -284,76 +285,126 @@ namespace TpAjedrezLP2
                     
                 case Piezas.Reina: 
                     i = 1;
-                    while (contadorCasillas != 20) //ya ataco todas las casillas posibles para la reina,
-                                                   //esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
+                    while (i<5) //ya ataco todas las casillas posibles para la reina,//esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
                     {
-                        if (DentroTablero(fila + i, columna + i))
+                        switch (i)
                         {
-                            if (tablero[fila + i, columna + i] == 0 )
-                            {
-                                tablero[fila + i, columna + i] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if (DentroTablero(fila + i, columna - i))
-                        {
-                            if (tablero[fila + i, columna - i] == 0)
-                                contadorCasillas++;
-                        }
-                        if (DentroTablero(fila - i, columna + i))
-                        {
-                            if (tablero[fila - i, columna + i] == 0)
-                            {
-                                tablero[fila - i, columna + i] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if(DentroTablero(fila - i, columna - i))
-                        {
-                            if (tablero[fila - i, columna - i] == 0)
-                            {
-                                tablero[fila - i, columna - i] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if (DentroTablero(fila, columna + i))
-                        {
-                            if (tablero[fila, columna + i] == 0)
-                            {
-                                tablero[fila, columna + i] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if (DentroTablero(fila, columna - i))
-                        {
-                            if (tablero[fila, columna - i] == 0)
-                            {
-                                tablero[fila, columna - i] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if (DentroTablero(fila + i, columna))
-                        {
-                            if (tablero[fila + i, columna] == 0)
-                            {
-                                tablero[fila + i, columna] = 1;
-                                contadorCasillas++;
-                            }
-                        }
-                        if (DentroTablero(fila - i, columna))
-                        {
-                            if (tablero[fila - i, columna] == 0)
-                            {
-                                tablero[fila - i, columna] = 1;
-                                contadorCasillas++;
-                            }
-                        }
+                            case 1:
+                            case 2:
+                            case 3:
+                                if (tablero[fila + i, columna + i] == 0)
+                                {
+                                    tablero[fila + i, columna + i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila + i, columna - i] == 0)
+                                {
+                                    tablero[fila + i, columna - i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila - i, columna + i] == 0)
+                                {
+                                    tablero[fila - i, columna + i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila - i, columna - i] == 0)
+                                {
+                                    tablero[fila - i, columna - i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila, columna + i] == 0)
+                                {
+                                    tablero[fila, columna + i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila, columna - i] == 0)
+                                {
+                                    tablero[fila, columna - i] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila + i, columna] == 0)
+                                {
+                                    tablero[fila + i, columna] = 1;
+                                    contadorCasillas++;
+                                }
+                                if (tablero[fila - i, columna] == 0)
+                                {
+                                    tablero[fila - i, columna] = 1;
+                                    contadorCasillas++;
+                                }
+                            case 4:
+                                if (DentroTablero(fila + i, columna + i))
+                                {
+                                    if (tablero[fila + i, columna + i] == 0)
+                                    {
+                                        tablero[fila + i, columna + i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila + i, columna - i))
+                                {
+                                    if (tablero[fila + i, columna - i] == 0)
+                                    {
+                                        tablero[fila + i, columna - i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila - i, columna + i))
+                                {
+                                    if (tablero[fila - i, columna + i] == 0)
+                                    {
+                                        tablero[fila - i, columna + i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila - i, columna - i))
+                                {
+                                    if (tablero[fila - i, columna - i] == 0)
+                                    {
+                                        tablero[fila - i, columna - i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila, columna + i))
+                                {
+                                    if (tablero[fila, columna + i] == 0)
+                                    {
+                                        tablero[fila, columna + i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila, columna - i))
+                                {
+                                    if (tablero[fila, columna - i] == 0)
+                                    {
+                                        tablero[fila, columna - i] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila + i, columna))
+                                {
+                                    if (tablero[fila + i, columna] == 0)
+                                    {
+                                        tablero[fila + i, columna] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                                if (DentroTablero(fila - i, columna))
+                                {
+                                    if (tablero[fila - i, columna] == 0)
+                                    {
+                                        tablero[fila - i, columna] = 1;
+                                        contadorCasillas++;
+                                    }
+                                }
+                        } 
+                        
+                        i++;
                     }
                     break;
             }
             return contadorCasillas;
         }
-
         public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
             int i = 0;
@@ -619,7 +670,3 @@ namespace TpAjedrezLP2
 
     }
 }
-// 
-//
-//
-//
