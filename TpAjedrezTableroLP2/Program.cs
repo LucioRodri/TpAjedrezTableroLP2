@@ -6,13 +6,14 @@ using System.Windows.Forms;
 
 namespace TpAjedrezLP2
 {
-    //TODO: Terminar la funcion  de la reina (verticalHorizontal y diagonal), TERMINADO
     //TODO: Verificar que no esten repetido
     // - Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
     //   encuentra un nuevo orden, lo comparamos con la matriz ára ver que no se repita. 
     public class Program
     {
         public const int N = 8;
+        public const int T = 10;
+        public const int P = 5;
         public const int Tableros = 10;
         public enum Piezas
         {
@@ -35,6 +36,7 @@ namespace TpAjedrezLP2
             int[] PosPiezaParcial = new int[2];
             int[] PosPiezaParcialAux = new int[2];
             int[,] PosPiezas = new int[8,2];
+            int[,] OrdenesTableros = new int[T,P];//T: Tableros  //P: PosicionesRand
 
             //TORRES
             int[] PosTorre1 = new int[2];
@@ -46,6 +48,7 @@ namespace TpAjedrezLP2
             int[] PosReina = new int[2];
              
             int auxK; //para el segundo for interior
+            int[] arrayAux;
 
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
@@ -53,7 +56,15 @@ namespace TpAjedrezLP2
                 TableroAux = (int[,])TableroOriginal.Clone();
                 casillasAtacadas = 28; //las casillas que atacan las torres
                 //Determinamos el orden aleatorio que se van a probar las piezas
-                int[] arrayAux = OrdenAleatorio(arrayPiezas); //para no modificar el array original
+                bool var = true;
+                
+                while (var)
+                {
+                     arrayAux = OrdenAleatorio(arrayPiezas);
+                    if (!TableroRepetido(OrdenesTableros, T, P, arrayAux))
+                        var = false;
+                }
+                //para no modificar el array original
                 
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
@@ -105,6 +116,9 @@ namespace TpAjedrezLP2
                 //casillasAtacadas += CasillasMax;
                 if(casillasAtacadas == 64)
                 {
+                    //TODO: Fijarse xq sale error ACA
+                    //GuardarPosicion(OrdenesTableros,ContTableros, P, arrayAux); 
+                    Console.Write("TABLERO N° {0}\n", ContTableros + 1);
                     ImprimirTablero(TableroAux);
                     int[] arrayPiezasFatales = new int[8];//llamar funcion atacar casillas fatales
                     arrayPiezas.CopyTo(arrayPiezasFatales,0);
@@ -125,6 +139,7 @@ namespace TpAjedrezLP2
 
         }
 
+        //----------------------------------------------------FUNCiONES------------------------------------------------------------------------
         public static void casillasFatales(int[] arrayPiezas, int[,]Posiciones, int[,]tablero)//las posiciones estan en el mismo orden que las piezas
         {
             
@@ -158,7 +173,6 @@ namespace TpAjedrezLP2
                 }
             }
         }
-
         public static void fatalHorizontalVertical(int fila, int columna, int[,] tablero)
         {
             int j = 1;
@@ -208,7 +222,6 @@ namespace TpAjedrezLP2
 
 
         }
-
         public static void fatalDiagonal(int fila, int columna, int[,] tablero)
         {
             int k = 1;
@@ -256,7 +269,6 @@ namespace TpAjedrezLP2
                 }
             }
         }
-
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
             int contadorCasillas = 0;
@@ -820,5 +832,36 @@ namespace TpAjedrezLP2
             tableroDestino = (int[,])tableroFuente.Clone();
         }
 
+        public static bool TableroRepetido(int[,] Ordenes, int fil, int col, int[]OrdenPiezas)
+        {
+            int i = 0, j = 0;
+            while (i<fil)
+            {
+                if (Ordenes[i, j] == OrdenPiezas[j])
+                {
+                    j++;
+                    if(j==col)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            return true;
+        }
+        public static void GuardarPosicion(int[,] Ordenes,int pos, int col, int[] OrdenPiezas)
+        {
+            for (int k = 0; k < col; k++)
+            {
+                Ordenes[pos, k] = OrdenPiezas[k];
+            }
+        }
     }
 }
+// 1 2 3 4
+// 1 2 3 4
+// 1 2 3 4
+// 1 2 3 4
