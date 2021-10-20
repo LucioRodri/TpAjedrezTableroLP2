@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace TpAjedrezLP2
 {
-    //TODO: Terminar la funcion  de la reina (verticalHorizontal y diagonal)
+    //TODO: Terminar la funcion  de la reina (verticalHorizontal y diagonal), TERMINADO
     //TODO: Verificar que no esten repetido
     // - Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
     //   encuentra un nuevo orden, lo comparamos con la matriz ára ver que no se repita. 
@@ -133,95 +133,27 @@ namespace TpAjedrezLP2
                 int k = 1, j = 1;
                 switch ((Piezas)arrayPiezas[i])
                 {
-                    case Piezas.T1:
-
-                        while (tablero[Posiciones[i, 0], Posiciones[i, 1] + j] == 1 || tablero[Posiciones[i, 0], Posiciones[i, 1] + j] == (int)Piezas.X)
-                        {
-                            tablero[Posiciones[i, 0], Posiciones[i, 1] + j] = (int)Piezas.X;
-                            j++;
-                            if (Posiciones[i, 1] + j >= N)
-                                break;
-                        }
-                        while (tablero[Posiciones[i, 0] + k, Posiciones[i, 1]] == 1 || tablero[Posiciones[i, 0] + k, Posiciones[i, 1]] == (int)Piezas.X)
-                        {
-                            tablero[Posiciones[i, 0] + k, Posiciones[i, 1]] = (int)Piezas.X;
-                            k++;
-                            if (Posiciones[i, 0] + k >= N)
-                                    break;
-                        }
-                        break;
-
+                    case Piezas.T1:                    
                     case Piezas.T2:
-                        while (tablero[Posiciones[i, 0], Posiciones[i, 1] - j] == 1 || tablero[Posiciones[i, 0], Posiciones[i, 1] - j] == (int)Piezas.X)
-                        {
-                            tablero[Posiciones[i, 0], Posiciones[i, 1] - j] = (int)Piezas.X;
-                            j++;
-                            if (Posiciones[i, 1] - j < 0)
-                                break;
-                        }
-                        while (tablero[Posiciones[i, 0] - k, Posiciones[i, 1]] == 1 || tablero[Posiciones[i, 0] - k, Posiciones[i, 1]] == (int)Piezas.X)
-                        {
-                            tablero[Posiciones[i, 0] - k, Posiciones[i, 1]] = (int)Piezas.X;
-                            k++;
-                            if (Posiciones[i, 0] - k < 0 )
-                                break;
-                        }
+                        fatalHorizontalVertical(Posiciones[i, 0], Posiciones[i, 1], tablero);
                         break;
+
                     case Piezas.Ry:
                         pintarCasillas(Posiciones[i, 0], Posiciones[i, 1],Piezas.Ry, tablero, 1,(int)Piezas.X);
                         break;
+
                     case Piezas.C1:
                     case Piezas.C2:
                         pintarCasillas(Posiciones[i, 0], Posiciones[i, 1], Piezas.C1, tablero, 1, (int)Piezas.X);
                         break;
+
                     case Piezas.AN:
                     case Piezas.AB:
-                        if (DentroTablero(Posiciones[i, 0] + k, Posiciones[i, 1] + k)) //abajo a la derecha
-                        {
-                            while (tablero[Posiciones[i, 0] + k, Posiciones[i, 1] + k] == 1 || tablero[Posiciones[i, 0] + k, Posiciones[i, 1] + k] == (int)Piezas.X)
-                            {
-                                tablero[Posiciones[i, 0] + k, Posiciones[i, 1] + k] = (int)Piezas.X;
-                                k++;
-                                if (Posiciones[i, 0] + k >= N || Posiciones[i, 1] + k >= N)
-                                    break;
-                            }
-                        }
-                        k = 1;
-                        if (DentroTablero(Posiciones[i, 0] + k, Posiciones[i, 1] - k)) //abajo a la izquierda
-                        {
-                            while (tablero[Posiciones[i, 0] + k, Posiciones[i, 1] - k] == 1 || tablero[Posiciones[i, 0] + k, Posiciones[i, 1] - k] == (int)Piezas.X)
-                            {
-                                tablero[Posiciones[i, 0] + k, Posiciones[i, 1] - k] = (int)Piezas.X;
-                                k++;
-                                if (Posiciones[i, 0] + k >= N || Posiciones[i, 1] - k < 0)
-                                    break;
-                            }
-                        }
-                        k = 1;
-                        if (DentroTablero(Posiciones[i, 0] - k, Posiciones[i, 1] + k))
-                        {
-                            while (tablero[Posiciones[i, 0] - k, Posiciones[i, 1] + k] == 1 || tablero[Posiciones[i, 0] - k, Posiciones[i, 1] + k] == (int)Piezas.X)
-                                {
-                                    tablero[Posiciones[i, 0] - k, Posiciones[i, 1] + k] = (int)Piezas.X;
-                                    k++;
-                                    if (Posiciones[i, 0] - k < 0 || Posiciones[i,  1] + k >= N)
-                                        break;
-                                }
-                        }
-                        k = 1;
-                        if (DentroTablero(Posiciones[i, 0] - k, Posiciones[i, 1] - k))
-                        {
-                            while (tablero[Posiciones[i, 0] - k, Posiciones[i, 1] - k] == 1 || tablero[Posiciones[i, 0] - k, Posiciones[i, 1] - k] == (int)Piezas.X)
-                                {
-                                    tablero[Posiciones[i, 0] - k, Posiciones[i, 1] - k] = (int)Piezas.X;
-                                    k++;
-                                    if (Posiciones[i, 0] - k < 0 || Posiciones[i,  1] - k < 0)
-                                        break;
-                                }
-                        }
+                        fatalDiagonal(Posiciones[i, 0], Posiciones[i, 1], tablero);
                         break;
                     case Piezas.Ra:
-
+                        fatalHorizontalVertical(Posiciones[i, 0], Posiciones[i, 1], tablero);
+                        fatalDiagonal(Posiciones[i, 0], Posiciones[i, 1], tablero);
                         break;
                 }
             }
@@ -229,12 +161,100 @@ namespace TpAjedrezLP2
 
         public static void fatalHorizontalVertical(int fila, int columna, int[,] tablero)
         {
+            int j = 1;
+            if (DentroTablero(fila, columna + j))
+                {
+                while (tablero[fila, columna + j] == 1 || tablero[fila, columna + j] == (int)Piezas.X)
+                {
+                    tablero[fila, columna + j] = (int)Piezas.X;
+                    j++;
+                    if (columna + j >= N)
+                        break;
+                }
+            }
+            j = 1;
+            if (DentroTablero(fila, columna - j))
+            {
+                while (tablero[fila, columna - j] == 1 || tablero[fila, columna - j] == (int)Piezas.X)
+                {
+                    tablero[fila, columna - j] = (int)Piezas.X;
+                    j++;
+                    if (columna - j < 0)
+                        break;
+                }
+            }
+            j = 1;
+            if (DentroTablero(fila + j, columna))
+            {
+                while (tablero[fila + j, columna] == 1 || tablero[fila + j, columna] == (int)Piezas.X)
+                {
+                    tablero[fila + j, columna] = (int)Piezas.X;
+                    j++;
+                    if (fila + j >= N)
+                        break;
+                }
+            }
+            j = 1;
+            if (DentroTablero(fila - j, columna))
+            {
+                while (tablero[fila - j, columna] == 1 || tablero[fila - j, columna] == (int)Piezas.X)
+                {
+                    tablero[fila - j, columna] = (int)Piezas.X;
+                    j++;
+                    if (fila - j < 0)
+                        break;
+                }
+            }
+
 
         }
 
         public static void fatalDiagonal(int fila, int columna, int[,] tablero)
         {
-
+            int k = 1;
+            if (DentroTablero(fila + k, columna + k)) //abajo a la derecha
+            {
+                while (tablero[fila + k, columna + k] == 1 || tablero[fila + k, columna + k] == (int)Piezas.X)
+                {
+                    tablero[fila + k, columna + k] = (int)Piezas.X;
+                    k++;
+                    if (fila + k >= N || columna + k >= N)
+                        break;
+                }
+            }
+            k = 1;
+            if (DentroTablero(fila + k, columna - k)) //abajo a la izquierda
+            {
+                while (tablero[fila + k, columna - k] == 1 || tablero[fila + k, columna - k] == (int)Piezas.X)
+                {
+                    tablero[fila + k, columna - k] = (int)Piezas.X;
+                    k++;
+                    if (fila + k >= N || columna - k < 0)
+                        break;
+                }
+            }
+            k = 1;
+            if (DentroTablero(fila - k, columna + k))
+            {
+                while (tablero[fila - k, columna + k] == 1 || tablero[fila - k, columna + k] == (int)Piezas.X)
+                {
+                    tablero[fila - k, columna + k] = (int)Piezas.X;
+                    k++;
+                    if (fila - k < 0 || columna + k >= N)
+                        break;
+                }
+            }
+            k = 1;
+            if (DentroTablero(fila - k, columna - k))
+            {
+                while (tablero[fila - k, columna - k] == 1 || tablero[fila - k, columna - k] == (int)Piezas.X)
+                {
+                    tablero[fila - k, columna - k] = (int)Piezas.X;
+                    k++;
+                    if (fila - k < 0 || columna - k < 0)
+                        break;
+                }
+            }
         }
 
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
