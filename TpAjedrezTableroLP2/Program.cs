@@ -6,6 +6,10 @@ using System.Windows.Forms;
 
 namespace TpAjedrezLP2
 {
+    //TODO: Terminar la funcion  de la reina (verticalHorizontal y diagonal)
+    //TODO: Verificar que no esten repetido
+    // - Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
+    //   encuentra un nuevo orden, lo comparamos con la matriz ára ver que no se repita. 
     public class Program
     {
         public const int N = 8;
@@ -61,7 +65,7 @@ namespace TpAjedrezLP2
                 PosReina[1] = columna;
 
                 //CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
-                 //la funcion de CopiarTablero() no esta funcionando
+                //la funcion de CopiarTablero() no esta funcionando
                 //Triple for n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
                 for (int i = 0; i < 5; i++)//FOR para cada pieza xq son 5 piezas
                 {
@@ -222,7 +226,6 @@ namespace TpAjedrezLP2
                 }
             }
         }
-    
 
         public static void fatalHorizontalVertical(int fila, int columna, int[,] tablero)
         {
