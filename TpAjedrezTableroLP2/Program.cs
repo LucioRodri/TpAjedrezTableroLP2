@@ -49,23 +49,35 @@ namespace TpAjedrezLP2
              
             int auxK; //para el segundo for interior
             int[] arrayAux;
-
+            int[,] ordenesAux = new int[Tableros, 5];
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
                 TableroAux = (int[,])TableroOriginal.Clone();
                 casillasAtacadas = 28; //las casillas que atacan las torres
                 //Determinamos el orden aleatorio que se van a probar las piezas
-                bool var = true;
+                bool var = false;
                 
-                while (var)
+               /* while (var)
                 {
                      arrayAux = OrdenAleatorio(arrayPiezas);
                     if (!TableroRepetido(OrdenesTableros, T, P, arrayAux))
                         var = false;
+                }*/
+                //elegir una
+                while (!var)
+                {
+                    if (ContTableros != 0)
+                    {
+                        arrayPiezas = OrdenAleatorio(arrayPiezas);
+                        if (TableroRepetido2(arrayPiezas, ordenesAux, ContTableros))
+                            var = true;
+                    }
+                    else
+                        var = true;
                 }
                 //para no modificar el array original
-                
+
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
@@ -114,13 +126,18 @@ namespace TpAjedrezLP2
 
                 }
                 //casillasAtacadas += CasillasMax;
-                if(casillasAtacadas == 64)
+                if (casillasAtacadas == 64)
                 {
                     //TODO: Fijarse xq sale error ACA
                     //GuardarPosicion(OrdenesTableros,ContTableros, P, arrayAux); 
                     Console.Write("TABLERO N° {0}\n", ContTableros + 1);
                     ImprimirTablero(TableroAux);
                     int[] arrayPiezasFatales = new int[8];//llamar funcion atacar casillas fatales
+                    ordenesAux[ContTableros, 0] = arrayPiezas[0];
+                    ordenesAux[ContTableros, 1] = arrayPiezas[1];
+                    ordenesAux[ContTableros, 2] = arrayPiezas[2];
+                    ordenesAux[ContTableros, 3] = arrayPiezas[3];
+                    ordenesAux[ContTableros, 4] = arrayPiezas[4];
                     arrayPiezas.CopyTo(arrayPiezasFatales,0);
                     arrayPiezasFatales[5] = (int)Piezas.Ra;
                     arrayPiezasFatales[6] = (int)Piezas.T1;
@@ -139,7 +156,7 @@ namespace TpAjedrezLP2
 
         }
 
-        //----------------------------------------------------FUNCiONES------------------------------------------------------------------------
+        //----------------------------------------------------FUNCIONES------------------------------------------------------------------------
         public static void casillasFatales(int[] arrayPiezas, int[,]Posiciones, int[,]tablero)//las posiciones estan en el mismo orden que las piezas
         {
             
@@ -850,6 +867,28 @@ namespace TpAjedrezLP2
                     i++;
                 }
             }
+            return true;
+        }
+        public static bool TableroRepetido2(int[] ordenComprobar, int[,] OrdenesHechos, int indice)
+        {
+            int i, j;
+            bool distinto;
+            for(i = 0; i < indice; i++)
+            {
+                distinto = false;
+                for(j = 0; j < 5; j++)
+                {
+                    if(OrdenesHechos[i, j] != ordenComprobar[j])
+                    {
+                        distinto = true;
+                        break;
+                    }
+                }
+                if (j == 5)
+                    break;
+            }
+            if (i != indice)
+                return false;
             return true;
         }
         public static void GuardarPosicion(int[,] Ordenes,int pos, int col, int[] OrdenPiezas)
