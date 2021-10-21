@@ -7,13 +7,13 @@ using System.Windows.Forms;
 namespace TpAjedrezLP2
 {
     //TODO: Verificar que no esten repetido
-    // - Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
+    //  Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
     //   encuentra un nuevo orden, lo comparamos con la matriz ára ver que no se repita. 
     public class Program
     {
         public const int N = 8;
-        public const int P = 5;
-        public const int Tableros = 10;
+        public const int P = 5; //cantidad de piezas que van a conformar el orden aleatorio
+        public const int Tableros = 10; //cantidad de tableros requeridos
         public enum Piezas
         {
             //El 0: Casilla Vacia
@@ -24,10 +24,11 @@ namespace TpAjedrezLP2
         static void Main()
         {
             // ----------------------------------------TABLEROS Y VARIABLES -----------------------------------------------
+           //declaramos y creamos los tableros que vamos a usar
             int[,] TableroOriginal = CrearTablero();
             int[,] TableroAux = CrearTablero();
-            int[] arrayPiezas = CrearPiezas();
 
+            int[] arrayPiezas = CrearPiezas(); //creamos el array donde se guardaron las piezas a colocar
             int ContTableros = 0;
             int CasillasMax = 0;
             int CasillasMaxAux = 0;
@@ -37,84 +38,81 @@ namespace TpAjedrezLP2
             int[,] PosPiezas = new int[8,2];
             int[,] OrdenesTableros = new int[Tableros,P];  //T: Tableros  //P: PosicionesRand
 
-            //TORRES
+            //TORRES, sus posiciones seran fijas
             int[] PosTorre1 = new int[2];
-            PosTorre1[0] = 0; PosTorre1[1] = 0;
+            PosTorre1[0] = 0; PosTorre1[1] = 0; 
             int[] PosTorre2 = new int[2];
             PosTorre2[0] = 7; PosTorre2[1] = 7;
             casillasAtacadas += colocarTorres(PosTorre1, PosTorre2, TableroOriginal);
 
             int[] PosReina = new int[2];
              
-            int auxK; //para el segundo for interior
+            int auxK; //para el segundo for interior, usado para los alfiles
+
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
-                TableroAux = (int[,])TableroOriginal.Clone();
+                TableroAux = (int[,])TableroOriginal.Clone(); //pasamos el contenido del tablero creado a uno auxiliar, que es el que vamos a usar
                 casillasAtacadas = 28; //las casillas que atacan las torres
-                //Determinamos el orden aleatorio que se van a probar las piezas
                 bool var = false;
-                while (!var)
+                while (!var) //vamos creando ordenes aleatorios hasta tener uno que no se haya usado ya
                 {
                         arrayPiezas = OrdenAleatorio(arrayPiezas);
                         if (!TableroRepetido(arrayPiezas, OrdenesTableros, ContTableros))
                             var = true;
                 }
-                //para no modificar el array original
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
                 int columna = rnd.Next(3, 5);
-                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Ra, TableroAux);
+                casillasAtacadas += atacarCasillas(fila, columna, Piezas.Ra, TableroAux); //agregamos la cantidad de casillas que ataca la reina segun su posicion
                 SetPosicion(Program.Piezas.Ra, fila, columna, TableroAux); //cuando implementemos el forms, esto queda determinado por el usuario
                 PosReina[0] = fila;
                 PosReina[1] = columna;
 
-                //CopiarTablero(TableroOriginal, TableroAux); //cada vez que buscamos un tablero, lo reinciamos
-                //la funcion de CopiarTablero() no esta funcionando
-                //Triple for n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
-                for (int i = 0; i < 5; i++)//FOR para cada pieza xq son 5 piezas
+                //Triple for, complejidad n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
+                for (int i = 0; i < 5; i++)//FOR para las 5 piezas
                 {
-                    CasillasMax = 0;
+                    CasillasMax = 0; //la cantidad de casillas que ataca cada pieza en su posicion "optima"
                     int aux = 1;
                     for (int j = 0; j < N; j++)
                     {
-                        auxK = 0;
+                        auxK = 0; //esto determinara segun el color del alfil y de la casilla donde este, la posicion inicial
                         if (arrayPiezas[i] == (int)Piezas.AB || arrayPiezas[i] == (int)Piezas.AN)//Pregunta si la pieza es un alfil
                         {
-                            aux = 2; //incrementamos el for de a 2 
+                            aux = 2; //incrementamos el for de a 2 si las piezas son alfiles, respetando su color
                             if ((arrayPiezas[i] == (int)Piezas.AB && j % 2 == 0) || (arrayPiezas[i] == (int)Piezas.AN && j % 2 != 0))
                                 auxK = 1;
                         }
                         for (int k = auxK; k < N; k = k + aux)
                         {
                         
-                            if (ValidarPosicion(j, k, TableroAux, (Piezas)arrayPiezas[i]))
+                            if (ValidarPosicion(j, k, TableroAux, (Piezas)arrayPiezas[i])) //antes de empezar a buscar la posicion optima, verificamos que la actual sea valida (que no haya ota pieza)
                             {
                                 //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
                                 CasillasMaxAux = atacarCasillas(j, k, (Piezas)arrayPiezas[i], TableroAux);
-                                if (CasillasMaxAux >= CasillasMax)
+                                if (CasillasMaxAux >= CasillasMax) //si se encuentra una posicion donde se atacan mas casillas, la actualizamos
                                 {
                                     CasillasMax = CasillasMaxAux;
-                                    PosPiezaParcial[0] = j; PosPiezaParcial[1] = k;
+                                    PosPiezaParcial[0] = j; PosPiezaParcial[1] = k; //vamos guardando las posiciones del ataque mas optimo
                                 }                             
                             }
                         }
                     }
-                    PosPiezas[i,0] = PosPiezaParcial[0];
+                    PosPiezas[i,0] = PosPiezaParcial[0]; //ya esta seria la posicion optima
                     PosPiezas[i, 1] = PosPiezaParcial[1];
-                    SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux);
+                    SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux); //una vez que tenemos la posicion optima, vemos cuantas casillas atacadas hay y la colocamos en el tablero
                     casillasAtacadas += CasillasMax;
-                    pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux,0,1);
-
+                    pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux,0,1); //rellenamos el tablero con 1(casillas atacadas leves)
                 }
-                //casillasAtacadas += CasillasMax;
+                //Si se encuentra un tablero
                 if (casillasAtacadas == 64)
                 {
-                    GuardarPosicion(OrdenesTableros,ContTableros,arrayPiezas); 
+                    GuardarPosicion(OrdenesTableros,ContTableros,arrayPiezas); //guardamos el orden que usamos para encontrar el tablero
                     Console.Write("------ TABLERO N°{0} ------\n", ContTableros + 1);
                     ImprimirTablero(TableroAux);// Se imprime el tablero con las casillas atacadas generales en 1
-                    int[] arrayPiezasFatales = new int[8];//llamar funcion atacar casillas fatales
+                    //Empieza el filtrado de ataques fatales
+                    int[] arrayPiezasFatales = new int[8];
                     arrayPiezas.CopyTo(arrayPiezasFatales,0);
                     arrayPiezasFatales[5] = (int)Piezas.Ra;
                     arrayPiezasFatales[6] = (int)Piezas.T1;
@@ -125,9 +123,9 @@ namespace TpAjedrezLP2
                     PosPiezas[6, 1] = PosTorre1[1];
                     PosPiezas[7, 0] = PosTorre2[0];
                     PosPiezas[7, 1] = PosTorre2[1];
-                    casillasFatales(arrayPiezasFatales, PosPiezas, TableroAux);
+                    casillasFatales(arrayPiezasFatales, PosPiezas, TableroAux); 
                     Console.Write("------ TABLERO FATAL N°{0} ------\n", ContTableros + 1);
-                    ImprimirTablero(TableroAux); // Se imprime el tablero con la distincion entre
+                    ImprimirTablero(TableroAux); // Se imprime el tablero con la distincion entre fatales y leves
                     ContTableros++;
                 }
             } while (ContTableros < Tableros);
@@ -439,7 +437,7 @@ namespace TpAjedrezLP2
                     
                 case Piezas.Ra:
                     i = 1;
-                    while (i<5) //ya ataco todas las casillas posibles para la reina,//esta condicion se puede reemplazar para un caso mas general con la condicion del while de la funcion pintar casillas
+                    while (i<5) //ya ataco todas las casillas posibles para la reina,
                     {
                         switch (i){
                             case 1:
