@@ -12,7 +12,6 @@ namespace TpAjedrezLP2
     public class Program
     {
         public const int N = 8;
-        public const int T = 10;
         public const int P = 5;
         public const int Tableros = 10;
         public enum Piezas
@@ -36,7 +35,7 @@ namespace TpAjedrezLP2
             int[] PosPiezaParcial = new int[2];
             int[] PosPiezaParcialAux = new int[2];
             int[,] PosPiezas = new int[8,2];
-            int[,] OrdenesTableros = new int[T,P];//T: Tableros  //P: PosicionesRand
+            int[,] OrdenesTableros = new int[Tableros,P];  //T: Tableros  //P: PosicionesRand
 
             //TORRES
             int[] PosTorre1 = new int[2];
@@ -48,8 +47,6 @@ namespace TpAjedrezLP2
             int[] PosReina = new int[2];
              
             int auxK; //para el segundo for interior
-            int[] arrayAux;
-            int[,] ordenesAux = new int[Tableros, 5];
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
             do
             {
@@ -57,27 +54,13 @@ namespace TpAjedrezLP2
                 casillasAtacadas = 28; //las casillas que atacan las torres
                 //Determinamos el orden aleatorio que se van a probar las piezas
                 bool var = false;
-                
-               /* while (var)
-                {
-                     arrayAux = OrdenAleatorio(arrayPiezas);
-                    if (!TableroRepetido(OrdenesTableros, T, P, arrayAux))
-                        var = false;
-                }*/
-                //elegir una
                 while (!var)
                 {
-                    if (ContTableros != 0)
-                    {
                         arrayPiezas = OrdenAleatorio(arrayPiezas);
-                        if (TableroRepetido2(arrayPiezas, ordenesAux, ContTableros))
+                        if (!TableroRepetido(arrayPiezas, OrdenesTableros, ContTableros))
                             var = true;
-                    }
-                    else
-                        var = true;
                 }
                 //para no modificar el array original
-
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
@@ -128,16 +111,10 @@ namespace TpAjedrezLP2
                 //casillasAtacadas += CasillasMax;
                 if (casillasAtacadas == 64)
                 {
-                    //TODO: Fijarse xq sale error ACA
-                    //GuardarPosicion(OrdenesTableros,ContTableros, P, arrayAux); 
-                    Console.Write("TABLERO N° {0}\n", ContTableros + 1);
-                    ImprimirTablero(TableroAux);
+                    GuardarPosicion(OrdenesTableros,ContTableros,arrayPiezas); 
+                    Console.Write("------ TABLERO N°{0} ------\n", ContTableros + 1);
+                    ImprimirTablero(TableroAux);// Se imprime el tablero con las casillas atacadas generales en 1
                     int[] arrayPiezasFatales = new int[8];//llamar funcion atacar casillas fatales
-                    ordenesAux[ContTableros, 0] = arrayPiezas[0];
-                    ordenesAux[ContTableros, 1] = arrayPiezas[1];
-                    ordenesAux[ContTableros, 2] = arrayPiezas[2];
-                    ordenesAux[ContTableros, 3] = arrayPiezas[3];
-                    ordenesAux[ContTableros, 4] = arrayPiezas[4];
                     arrayPiezas.CopyTo(arrayPiezasFatales,0);
                     arrayPiezasFatales[5] = (int)Piezas.Ra;
                     arrayPiezasFatales[6] = (int)Piezas.T1;
@@ -149,7 +126,8 @@ namespace TpAjedrezLP2
                     PosPiezas[7, 0] = PosTorre2[0];
                     PosPiezas[7, 1] = PosTorre2[1];
                     casillasFatales(arrayPiezasFatales, PosPiezas, TableroAux);
-                    ImprimirTablero(TableroAux);
+                    Console.Write("------ TABLERO FATAL N°{0} ------\n", ContTableros + 1);
+                    ImprimirTablero(TableroAux); // Se imprime el tablero con la distincion entre
                     ContTableros++;
                 }
             } while (ContTableros < Tableros);
@@ -848,16 +826,15 @@ namespace TpAjedrezLP2
         {
             tableroDestino = (int[,])tableroFuente.Clone();
         }
-
-        public static bool TableroRepetido(int[,] Ordenes, int fil, int col, int[]OrdenPiezas)
+        public static bool TableroRepetido(int[] ordenComprobar, int[,] OrdenesHechos, int indice)
         {
             int i = 0, j = 0;
-            while (i<fil)
+            while (i<indice)
             {
-                if (Ordenes[i, j] == OrdenPiezas[j])
+                if (OrdenesHechos[i, j] == ordenComprobar[j])// 0 == 0
                 {
                     j++;
-                    if(j==col)
+                    if(j==P)
                     {
                         return true;
                     }
@@ -865,42 +842,17 @@ namespace TpAjedrezLP2
                 else
                 {
                     i++;
+                    j = 0;
                 }
             }
-            return true;
+            return false;
         }
-        public static bool TableroRepetido2(int[] ordenComprobar, int[,] OrdenesHechos, int indice)
+        public static void GuardarPosicion(int[,] Ordenes,int pos, int[] OrdenPiezas)
         {
-            int i, j;
-            bool distinto;
-            for(i = 0; i < indice; i++)
-            {
-                distinto = false;
-                for(j = 0; j < 5; j++)
-                {
-                    if(OrdenesHechos[i, j] != ordenComprobar[j])
-                    {
-                        distinto = true;
-                        break;
-                    }
-                }
-                if (j == 5)
-                    break;
-            }
-            if (i != indice)
-                return false;
-            return true;
-        }
-        public static void GuardarPosicion(int[,] Ordenes,int pos, int col, int[] OrdenPiezas)
-        {
-            for (int k = 0; k < col; k++)
+            for (int k = 0; k < P; k++)
             {
                 Ordenes[pos, k] = OrdenPiezas[k];
             }
         }
     }
 }
-// 1 2 3 4
-// 1 2 3 4
-// 1 2 3 4
-// 1 2 3 4
