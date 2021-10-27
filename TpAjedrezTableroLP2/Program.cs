@@ -4,11 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TpAjedrezLP2
+namespace TpAjedrezCopia
 {
-    //TODO: Verificar que no esten repetido
-    //  Guardar en una matriz el orden de piezas creado aleatoriamente. Una vez que se
-    //   encuentra un nuevo orden, lo comparamos con la matriz ára ver que no se repita. 
+
     public class Program
     {
         public const int N = 8;
@@ -24,29 +22,30 @@ namespace TpAjedrezLP2
         static void Main()
         {
             // ----------------------------------------TABLEROS Y VARIABLES -----------------------------------------------
-           //declaramos y creamos los tableros que vamos a usar
+            //declaramos y creamos los tableros que vamos a usar
             int[,] TableroOriginal = CrearTablero();
             int[,] TableroAux = CrearTablero();
 
-            int[] arrayPiezas = CrearPiezas(); //creamos el array donde se guardaron las piezas a colocar
+            int[] arrayPiezasAux = CrearPiezas(); //creamos el array donde se guardaron las piezas a colocar
+            int[] arrayPiezas = new int[8];
             int ContTableros = 0;
             int CasillasMax = 0;
             int CasillasMaxAux = 0;
             int casillasAtacadas = 0;
             int[] PosPiezaParcial = new int[2];
             int[] PosPiezaParcialAux = new int[2];
-            int[,] PosPiezas = new int[8,2];
-            int[,] OrdenesTableros = new int[Tableros,P];  //T: Tableros  //P: PosicionesRand
+            int[,] PosPiezas = new int[8, 2];
+            int[,] OrdenesTableros = new int[Tableros, N];  //T: Tableros  //P: PosicionesRand
 
             //TORRES, sus posiciones seran fijas
             int[] PosTorre1 = new int[2];
-            PosTorre1[0] = 0; PosTorre1[1] = 0; 
+            PosTorre1[0] = 0; PosTorre1[1] = 0;
             int[] PosTorre2 = new int[2];
             PosTorre2[0] = 7; PosTorre2[1] = 7;
             casillasAtacadas += colocarTorres(PosTorre1, PosTorre2, TableroOriginal);
 
             int[] PosReina = new int[2];
-             
+
             int auxK; //para el segundo for interior, usado para los alfiles
 
             //---------------------------Aca empieza el while principal del programa --------------------------------------------
@@ -54,13 +53,7 @@ namespace TpAjedrezLP2
             {
                 TableroAux = (int[,])TableroOriginal.Clone(); //pasamos el contenido del tablero creado a uno auxiliar, que es el que vamos a usar
                 casillasAtacadas = 28; //las casillas que atacan las torres
-                bool var = false;
-                while (!var) //vamos creando ordenes aleatorios hasta tener uno que no se haya usado ya
-                {
-                        arrayPiezas = OrdenAleatorio(arrayPiezas);
-                        if (!TableroRepetido(arrayPiezas, OrdenesTableros, ContTableros))
-                            var = true;
-                }
+
                 //Determinamos la posicion de la Reina de forma aleatoria
                 Random rnd = new Random();
                 int fila = rnd.Next(3, 5);
@@ -69,6 +62,9 @@ namespace TpAjedrezLP2
                 SetPosicion(Program.Piezas.Ra, fila, columna, TableroAux); //cuando implementemos el forms, esto queda determinado por el usuario
                 PosReina[0] = fila;
                 PosReina[1] = columna;
+
+                arrayPiezasAux = OrdenAleatorio(arrayPiezasAux);
+                arrayPiezasAux.CopyTo(arrayPiezas, 0);
 
                 //Triple for, complejidad n^3 -> Primer FOR para las piezas y los otros dos para recorrer el tablero con varios métodos de poda. 
                 for (int i = 0; i < 5; i++)//FOR para las 5 piezas
@@ -86,7 +82,7 @@ namespace TpAjedrezLP2
                         }
                         for (int k = auxK; k < N; k = k + aux)
                         {
-                        
+
                             if (ValidarPosicion(j, k, TableroAux, (Piezas)arrayPiezas[i])) //antes de empezar a buscar la posicion optima, verificamos que la actual sea valida (que no haya ota pieza)
                             {
                                 //aca deberiamos verificar que si la pieza es un alfil, que no este en la diagonal de la reina, pq sino las posiciones atacadas nunca serían las maximas
@@ -95,59 +91,65 @@ namespace TpAjedrezLP2
                                 {
                                     CasillasMax = CasillasMaxAux;
                                     PosPiezaParcial[0] = j; PosPiezaParcial[1] = k; //vamos guardando las posiciones del ataque mas optimo
-                                }                             
+                                }
                             }
                         }
                     }
-                    PosPiezas[i,0] = PosPiezaParcial[0]; //ya esta seria la posicion optima
+                    PosPiezas[i, 0] = PosPiezaParcial[0]; //ya esta seria la posicion optima
                     PosPiezas[i, 1] = PosPiezaParcial[1];
                     SetPosicion((Piezas)arrayPiezas[i], PosPiezaParcial[0], PosPiezaParcial[1], TableroAux); //una vez que tenemos la posicion optima, vemos cuantas casillas atacadas hay y la colocamos en el tablero
                     casillasAtacadas += CasillasMax;
-                    pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux,0,1); //rellenamos el tablero con 1(casillas atacadas leves)
+                    pintarCasillas(PosPiezaParcial[0], PosPiezaParcial[1], (Piezas)arrayPiezas[i], TableroAux, 0, 1); //rellenamos el tablero con 1(casillas atacadas leves)
                 }
-                //Si se encuentra un tablero
-                if (casillasAtacadas == 64)
+
+                //Si se encuentra un tablero             
+                arrayPiezas[5] = (int)Piezas.Ra;
+                arrayPiezas[6] = (int)Piezas.T1;
+                arrayPiezas[7] = (int)Piezas.T2;
+                PosPiezas[5, 0] = PosReina[0];
+                PosPiezas[5, 1] = PosReina[1];
+                PosPiezas[6, 0] = PosTorre1[0];
+                PosPiezas[6, 1] = PosTorre1[1];
+                PosPiezas[7, 0] = PosTorre2[0];
+                PosPiezas[7, 1] = PosTorre2[1];
+                //me fijo que no este repetido
+                if (!TableroRepetido(ConvertirPosicionANumero(PosPiezas, arrayPiezas), OrdenesTableros, ContTableros))
                 {
-                    GuardarPosicion(OrdenesTableros,ContTableros,arrayPiezas); //guardamos el orden que usamos para encontrar el tablero
-                    Console.Write("------ TABLERO N°{0} ------\n", ContTableros + 1);
-                    ImprimirTablero(TableroAux);// Se imprime el tablero con las casillas atacadas generales en 1
-                    //Empieza el filtrado de ataques fatales
-                    int[] arrayPiezasFatales = new int[8];
-                    arrayPiezas.CopyTo(arrayPiezasFatales,0);
-                    arrayPiezasFatales[5] = (int)Piezas.Ra;
-                    arrayPiezasFatales[6] = (int)Piezas.T1;
-                    arrayPiezasFatales[7] = (int)Piezas.T2;
-                    PosPiezas[5,0] = PosReina[0];
-                    PosPiezas[5, 1] = PosReina[1];
-                    PosPiezas[6, 0] = PosTorre1[0];
-                    PosPiezas[6, 1] = PosTorre1[1];
-                    PosPiezas[7, 0] = PosTorre2[0];
-                    PosPiezas[7, 1] = PosTorre2[1];
-                    casillasFatales(arrayPiezasFatales, PosPiezas, TableroAux); 
-                    Console.Write("------ TABLERO FATAL N°{0} ------\n", ContTableros + 1);
-                    ImprimirTablero(TableroAux); // Se imprime el tablero con la distincion entre fatales y leves
-                    ContTableros++;
+                    if (casillasAtacadas == 64)
+                    {
+                        GuardarPosicion(OrdenesTableros, ContTableros, ConvertirPosicionANumero(PosPiezas, arrayPiezas)); //guardamos el orden que usamos para encontrar el tablero
+                        Console.Write("------ TABLERO N°{0} ------\n", ContTableros + 1);
+                        ImprimirTablero(TableroAux);// Se imprime el tablero con las casillas atacadas generales en 1
+                                                    //Empieza el filtrado de
+                                                    //ataques fatales
+                        int[] arrayPiezasFatales = new int[8];
+                        arrayPiezas.CopyTo(arrayPiezasFatales, 0);
+                        casillasFatales(arrayPiezasFatales, PosPiezas, TableroAux);
+                        Console.Write("------ TABLERO FATAL N°{0} ------\n", ContTableros + 1);
+                        ImprimirTablero(TableroAux); // Se imprime el tablero con la distincion entre fatales y leves
+                        ContTableros++;
+                    }
                 }
             } while (ContTableros < Tableros);
-
+            Console.WriteLine("Se han encontrado 10 tableros diferentes!");
         }
 
         //----------------------------------------------------FUNCIONES------------------------------------------------------------------------
-        public static void casillasFatales(int[] arrayPiezas, int[,]Posiciones, int[,]tablero)//las posiciones estan en el mismo orden que las piezas
+        public static void casillasFatales(int[] arrayPiezas, int[,] Posiciones, int[,] tablero)//las posiciones estan en el mismo orden que las piezas
         {
-            
-            for(int i = 0; i < N; i++)
+
+            for (int i = 0; i < N; i++)
             {
                 int k = 1, j = 1;
                 switch ((Piezas)arrayPiezas[i])
                 {
-                    case Piezas.T1:                    
+                    case Piezas.T1:
                     case Piezas.T2:
                         fatalHorizontalVertical(Posiciones[i, 0], Posiciones[i, 1], tablero);
                         break;
 
                     case Piezas.Ry:
-                        pintarCasillas(Posiciones[i, 0], Posiciones[i, 1],Piezas.Ry, tablero, 1,(int)Piezas.X);
+                        pintarCasillas(Posiciones[i, 0], Posiciones[i, 1], Piezas.Ry, tablero, 1, (int)Piezas.X);
                         break;
 
                     case Piezas.C1:
@@ -170,7 +172,7 @@ namespace TpAjedrezLP2
         {
             int j = 1;
             if (DentroTablero(fila, columna + j))
-                {
+            {
                 while (tablero[fila, columna + j] == 1 || tablero[fila, columna + j] == (int)Piezas.X)
                 {
                     tablero[fila, columna + j] = (int)Piezas.X;
@@ -265,13 +267,13 @@ namespace TpAjedrezLP2
         public static int atacarCasillas(int fila, int columna, Piezas pieza, int[,] tablero)
         {
             int contadorCasillas = 0;
-            int i ;
+            int i;
             if (tablero[fila, columna] == 0)
                 contadorCasillas = 1; //si pongo la pieza en una posicion vacia
             switch (pieza)
             {
                 case Piezas.Ry:
-                    if(fila != 0 && fila != 7 && columna != 0 && columna != 7)
+                    if (fila != 0 && fila != 7 && columna != 0 && columna != 7)
                     {
                         if (tablero[fila + 1, columna - 1] == 0)
                             contadorCasillas++;
@@ -292,45 +294,47 @@ namespace TpAjedrezLP2
                     }
                     else //caso en los bordes 
                     {
-                        if(DentroTablero(fila + 1, columna - 1))
-                        {if (tablero[fila + 1, columna - 1] == 0) 
+                        if (DentroTablero(fila + 1, columna - 1))
+                        {
+                            if (tablero[fila + 1, columna - 1] == 0)
                                 contadorCasillas++;
                         }
                         if (DentroTablero(fila - 1, columna + 1))
-                        { if (tablero[fila - 1, columna + 1] == 0)
-                                contadorCasillas++;
-                        }
-                        if ( DentroTablero(fila + 1, columna + 1))
                         {
-                            if(tablero[fila + 1, columna + 1] == 0)
+                            if (tablero[fila - 1, columna + 1] == 0)
                                 contadorCasillas++;
                         }
-                        if(DentroTablero(fila - 1, columna - 1))
+                        if (DentroTablero(fila + 1, columna + 1))
+                        {
+                            if (tablero[fila + 1, columna + 1] == 0)
+                                contadorCasillas++;
+                        }
+                        if (DentroTablero(fila - 1, columna - 1))
                         {
                             if (tablero[fila - 1, columna - 1] == 0)
                                 contadorCasillas++;
                         }
-                        if(DentroTablero(fila, columna - 1))
+                        if (DentroTablero(fila, columna - 1))
                         {
                             if (tablero[fila, columna - 1] == 0)
                                 contadorCasillas++;
                         }
-                        if(DentroTablero(fila, columna + 1))
+                        if (DentroTablero(fila, columna + 1))
                         {
-                            if (tablero[fila, columna + 1] == 0 )
+                            if (tablero[fila, columna + 1] == 0)
                                 contadorCasillas++;
                         }
-                        if(DentroTablero(fila + 1, columna))
+                        if (DentroTablero(fila + 1, columna))
                         {
                             if (tablero[fila + 1, columna] == 0)
                                 contadorCasillas++;
                         }
-                       if(DentroTablero(fila - 1, columna))
+                        if (DentroTablero(fila - 1, columna))
                         {
-                            if (tablero[fila - 1, columna] == 0 )
+                            if (tablero[fila - 1, columna] == 0)
                                 contadorCasillas++;
                         }
-                     
+
                     }
                     break;
                 case Piezas.AB:
@@ -374,9 +378,9 @@ namespace TpAjedrezLP2
                             }
                             else
                                 d2++;
-                                
+
                         }
-                        if (direcciones == 3) 
+                        if (direcciones == 3)
                         {
                             if (!DentroTablero(fila + d3, columna - d3)) //abajo a la izquierda
                                 direcciones++;
@@ -433,13 +437,14 @@ namespace TpAjedrezLP2
                         if (tablero[fila + 1, columna + 2] == 0)
                             contadorCasillas++;
                     }
-                    break;   
-                    
+                    break;
+
                 case Piezas.Ra:
                     i = 1;
-                    while (i<5) //ya ataco todas las casillas posibles para la reina,
+                    while (i < 5) //ya ataco todas las casillas posibles para la reina,
                     {
-                        switch (i){
+                        switch (i)
+                        {
                             case 1:
                             case 2:
                             case 3:
@@ -550,15 +555,15 @@ namespace TpAjedrezLP2
                                     }
                                 }
                                 break;
-                        } 
-                        
+                        }
+
                         i++;
                     }
                     break;
             }
             return contadorCasillas;
         }
-        public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero,  int condicion, int parametro)
+        public static void pintarCasillas(int fila, int columna, Piezas pieza, int[,] tablero, int condicion, int parametro)
         {
             int i = 0;
             switch (pieza)
@@ -630,7 +635,7 @@ namespace TpAjedrezLP2
                     break;
                 case Piezas.AB:
                 case Piezas.AN:
-                    int d0 = 1,d1 = 1, d2 = 1, d3=1;
+                    int d0 = 1, d1 = 1, d2 = 1, d3 = 1;
                     int direcciones = 0;
                     while (direcciones != 4)
                     {
@@ -728,7 +733,7 @@ namespace TpAjedrezLP2
                             tablero[fila + 1, columna + 2] = parametro;
                     }
                     break;
-            }           
+            }
         }
         public static int[] OrdenAleatorio(int[] Piezas)
         {
@@ -810,7 +815,7 @@ namespace TpAjedrezLP2
             {
                 for (int j = 0; j < N; j++)
                 {
-                    if(tablero[i,j] <= 1)
+                    if (tablero[i, j] <= 1)
                         Console.Write(tablero[i, j] + "\t ");
                     else
                         Console.Write((Piezas)tablero[i, j] + "\t ");
@@ -824,32 +829,34 @@ namespace TpAjedrezLP2
         {
             tableroDestino = (int[,])tableroFuente.Clone();
         }
+        public static int[] ConvertirPosicionANumero(int[,] Posicion, int[] tiposDePieza)
+        {
+            int[] aux = new int[N];
+            for (int i = 0; i < N; i++)
+                aux[i] = (tiposDePieza[i] * 100 + Posicion[i, 1] * 10 + Posicion[i, 0]);
+            return aux;
+        }
         public static bool TableroRepetido(int[] ordenComprobar, int[,] OrdenesHechos, int indice)
         {
-            int i = 0, j = 0;
-            while (i<indice)
+            int contador;
+            for (int i = 0; i < indice; i++)
             {
-                if (OrdenesHechos[i, j] == ordenComprobar[j])// 0 == 0
+                contador = 0;
+                for (int j = 0; j < N; j++)
                 {
-                    j++;
-                    if(j==P)
-                    {
-                        return true;
-                    }
+                    if (OrdenesHechos[i, j] == ordenComprobar[j])
+                        contador++;
                 }
-                else
-                {
-                    i++;
-                    j = 0;
-                }
+                if (contador == N)
+                    return true;
             }
             return false;
         }
-        public static void GuardarPosicion(int[,] Ordenes,int pos, int[] OrdenPiezas)
+        public static void GuardarPosicion(int[,] Tableros, int pos, int[] PosicionesPiezas)
         {
-            for (int k = 0; k < P; k++)
+            for (int k = 0; k < N; k++)
             {
-                Ordenes[pos, k] = OrdenPiezas[k];
+                Tableros[pos, k] = PosicionesPiezas[k];
             }
         }
     }
